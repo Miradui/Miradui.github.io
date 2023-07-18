@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:locale" content="en_US">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-快照" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/07/18/%E5%BF%AB%E7%85%A7/" class="article-date">
+  <time class="dt-published" datetime="2023-07-18T12:44:21.000Z" itemprop="datePublished">2023-07-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/07/18/%E5%BF%AB%E7%85%A7/">快照</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="快照"><a href="#快照" class="headerlink" title="快照"></a>快照</h2><p><strong>定义：</strong>关于指定数据集合的一个完全可用拷贝，该拷贝包括相应数据在某个时间点（拷贝开始的时间点）的映像。快照可以是其所表示的数据的一个副本，也可以是数据的一个复制品。</p>
+<h3 id="写时拷贝COW-Copy-On-Write"><a href="#写时拷贝COW-Copy-On-Write" class="headerlink" title="写时拷贝COW(Copy-On-Write)"></a>写时拷贝COW(Copy-On-Write)</h3><p>创建快照以后，如果源卷的数据发生了变化，那么快照系统会首先将原始数据拷贝到快照卷上对应的数据块中，然后再对源卷进行改写。</p>
+<h4 id="写操作："><a href="#写操作：" class="headerlink" title="写操作："></a>写操作：</h4><p><img src="/./../../../note/img/COW-w.gif" alt="vxy7oe17w6"></p>
+<p>上图简要示例，<strong>快照创建以后</strong>，若上层业务对源卷写数据X，X在缓存中排队，快照系统将X即将写入的位置（逻辑地址）上的数据Y，拷贝到快照卷中对应的位置（逻辑地址）上，同时，生成一张映射表，表中一列记录源卷上数据变化的逻辑地址，另一列记录快照卷上数据变化的逻辑地址。我们可以看到，上层业务每下发一个数据块，存储上，发生了两次写操作：一次是源卷将数据写入快照卷（即图中Y），一次是上层业务将数据写入源卷（即图中X）。</p>
+<h4 id="读操作："><a href="#读操作：" class="headerlink" title="读操作："></a>读操作：</h4><p><img src="/./../../../note/img/COW-r.gif" alt="COW-r"></p>
+<p>如上图，快照卷若映射给上层业务进行数据分析等用途时，<strong>针对快照</strong>进行读操作时，首先由快照系统判断，上层业务需要读取的数据是否在快照卷中，若在，直接从快照卷读取，若不在，则查询映射表，去对应源卷的逻辑地中读取（这个查表并去源卷读的操作，也叫<strong>读重定向</strong>）。这一点，恰好就解释了为什么快照是一份完全可用的副本，它没有对源卷进行100%的拷贝，但对上层业务来说，却可以将快照看做是和源卷“一模一样”的副本。</p>
+<p><strong>针对源卷</strong>进行读操作时，与快照卷没有数据交互。</p>
+<p>我们可以看到，快照对源卷的数据具有很好的保护措施，快照可以单独作为一份可以读取的副本，但并没有像简单的镜像那样，一开始就占用了和源卷一样的空间，而是根据创建快照后上层业务产生的数据，来实时占用必需的存储空间。</p>
+<h4 id="快照回滚（rollback）："><a href="#快照回滚（rollback）：" class="headerlink" title="快照回滚（rollback）："></a><strong>快照回滚（rollback）：</strong></h4><p><img src="/./../../../note/img/COW-rollback.gif" alt="COW-rollback"></p>
+<p>如上图，回滚操作的前提条件是，锁定源卷（暂停对待回滚的逻辑地址上的IO操作），然后通过查映射表，将快照卷上的对应数据回拷到源卷中。</p>
+<h4 id="快照删除："><a href="#快照删除：" class="headerlink" title="快照删除："></a><strong>快照删除：</strong></h4><p>采用COW技术的快照，其源卷即保存着完整的实时数据，因此，删除快照时，直接销毁了快照卷和映射表，与源卷不存在数据交互。</p>
+<h3 id="写时重定向ROW-Redirect-On-Write"><a href="#写时重定向ROW-Redirect-On-Write" class="headerlink" title="写时重定向ROW(Redirect-On-Write)"></a>写时重定向ROW(Redirect-On-Write)</h3><p>创建快照以后，快照系统把对数据卷的写请求重定向给了快照预留的存储空间，直接将新的数据写入快照卷。上层业务读源卷时，创建快照前的数据从源卷读，创建快照后产生的数据，从快照卷读。</p>
+<h4 id="写操作：-1"><a href="#写操作：-1" class="headerlink" title="写操作："></a>写操作：</h4><p><img src="/./../../../note/img/ROW-w.gif" alt="ROW-w"></p>
+<p>如上图简要示例，<strong>快照创建以后</strong>，若上层业务对源卷写数据X，X在缓存中排队，快照系统判断X即将写入源卷的逻辑地址，然后将数据X写入快照卷中预留的对应逻辑地址中，同时，将源卷和快照卷的逻辑地址写入映射表，即写重定向。我们可以看到，上层针对源卷写入一个数据块X，存储上只发生一次写操作，只是写之前进行了重定向。</p>
+<h4 id="读操作：-1"><a href="#读操作：-1" class="headerlink" title="读操作："></a><strong>读操作：</strong></h4><p>若<strong>快照创建以后</strong>，上层业务<strong>对源卷进行读</strong>，则有两种情况：1）若读取的数据，在创建快照前产生，数据是保存在源卷上的，那么，上层就从源卷进行读取；2）若需要读取的数据是创建快照以后才产生的，那么上层就查询映射表，从快照卷进行读取（即读重定向）。</p>
+<p>若<strong>快照创建以后</strong>，上层业务<strong>对快照卷进行读</strong>，同样也有两种情况：1）若读取的数据，在创建快照前产生，数据是保存在源卷上的，那么上层就查询映射表，从源卷进行读取；2）若需要读取的数据是创建快照以后才产生的，那么上层就直接从快照卷进行读取。</p>
+<p>我们可以看到，ROW快照也是根据创建快照后上层业务产生的数据，来实时占用必需的存储空间。</p>
+<h4 id="快照回滚（rollback）：-1"><a href="#快照回滚（rollback）：-1" class="headerlink" title="快照回滚（rollback）："></a><strong>快照回滚（rollback）：</strong></h4><p>采用ROW技术的快照，其源卷始终保存着快照创建前的完整数据，快照创建后，上层业务产生的数据都写入了快照中，因此，快照的回滚只是取消了对源卷的读重定向操作。通俗地说，就是源卷上没有进行任何数据操作，上层业务对源卷的读，仅限于读源卷（即不会去读取快照卷的数据）。</p>
+<h4 id="快照删除：-1"><a href="#快照删除：-1" class="headerlink" title="快照删除："></a>快照删除：</h4><p><img src="/./../../../note/img/ROW-d.gif" alt="ROW-d"></p>
+<h3 id="两种技术对比："><a href="#两种技术对比：" class="headerlink" title="两种技术对比："></a>两种技术对比：</h3><p><img src="/./../img/snapshot-cmp.png" alt="snapshot-cmp"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/07/18/%E5%BF%AB%E7%85%A7/" data-id="clk8af5cc0000hwvtfoochr6i" data-title="快照" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-mit6-824-GFS" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/07/18/mit6-824-GFS/" class="article-date">
+  <time class="dt-published" datetime="2023-07-18T10:03:56.000Z" itemprop="datePublished">2023-07-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/07/18/mit6-824-GFS/">mit6.824-GFS</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/07/18/mit6-824-GFS/" data-id="clk8a3zhv00005gvt5019el4o" data-title="mit6.824-GFS" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-hello-world-1" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/07/15/hello-world-1/" class="article-date">
+  <time class="dt-published" datetime="2023-07-15T11:01:58.000Z" itemprop="datePublished">2023-07-15</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/07/15/hello-world-1/">hello world!</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>sdgasdgadsfgfdhsjgfsjjgsfgsjftdjsgftd</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/07/15/hello-world-1/" data-id="clk3wfmeu0000bgvteqfrcnvg" data-title="hello world!" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-hello-world" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/07/15/hello-world/" class="article-date">
+  <time class="dt-published" datetime="2023-07-15T11:00:22.029Z" itemprop="datePublished">2023-07-15</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/07/15/hello-world/">Hello World</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/07/15/hello-world/" data-id="clk3wfmf50001bgvta1ka38jv" data-title="Hello World" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/07/">July 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/07/18/%E5%BF%AB%E7%85%A7/">快照</a>
+          </li>
+        
+          <li>
+            <a href="/2023/07/18/mit6-824-GFS/">mit6.824-GFS</a>
+          </li>
+        
+          <li>
+            <a href="/2023/07/15/hello-world-1/">hello world!</a>
+          </li>
+        
+          <li>
+            <a href="/2023/07/15/hello-world/">Hello World</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
